@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-21">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="C:/Users/loaiy/.m2/repository/org/xerial/sqlite-jdbc/3.46.1.0/sqlite-jdbc-3.46.1.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/loaiy/.m2/repository/org/xerial/sqlite-jdbc/3.46.1.0/sqlite-jdbc-3.46.1.0-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/loaiy/.m2/repository/com/formdev/flatlaf/3.5.2/flatlaf-3.5.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/loaiy/.m2/repository/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
