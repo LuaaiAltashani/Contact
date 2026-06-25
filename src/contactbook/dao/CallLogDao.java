@@ -1,26 +1,24 @@
 package contactbook.dao;
 
 import contactbook.db.Database;
-import contactbook.model.Contact;
+import contactbook.model.CallLog;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-// جدول contacts: اضافة وتعديل وحذف
-public class ContactDao {
-	
-//ضافة جهة اتصال جديدة.
-    public Contact insert(Contact c) throws SQLException {
-        String sql = "INSERT INTO contacts(name, phone, email, notes) VALUES(?,?,?,?)";
+//ادارة عمليات الاضافةوالتعديل والحذف لسجلات المكالمات
+public class CallLogDao {
+
+	// إنشاء سجل مكالمة جديد
+    public CallLog insert(CallLog c) throws SQLException {
+        String sql = "INSERT INTO calls(contact_id, type, duration_seconds) VALUES(?,?,?)";
         try (Connection conn = Database.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setString(1, c.getName());
-            ps.setString(2, c.getPhone());
-            ps.setString(3, c.getEmail());
-            ps.setString(4, c.getNotes());
+            ps.setLong(1, c.getContactId());
+            ps.setString(2, c.getType());
+            ps.setInt(3, c.getDurationSeconds());
             ps.executeUpdate();
-
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) c.setId(rs.getLong(1));
             }
@@ -28,84 +26,43 @@ public class ContactDao {
         return c;
     }
 
-//تعديل بيانات جهة اتصال موجودة بناء على id
-    public void update(Contact c) throws SQLException {
-        String sql = "UPDATE contacts SET name=?, phone=?, email=?, notes=? WHERE id=?";
-        try (Connection conn = Database.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, c.getName());
-            ps.setString(2, c.getPhone());
-            ps.setString(3, c.getEmail());
-            ps.setString(4, c.getNotes());
-            ps.setLong(5, c.getId());
-            ps.executeUpdate();
-        }
-    }
-
-//حذف جهة اتصال باستخدام id
+    //حذف سجل مكالمة باستخدام id
     public void delete(long id) throws SQLException {
         try (Connection conn = Database.getConnection();
-             PreparedStatement ps = conn.prepareStatement("DELETE FROM contacts WHERE id=?")) {
+             PreparedStatement ps = conn.prepareStatement("DELETE FROM calls WHERE id=?")) {
             ps.setLong(1, id);
             ps.executeUpdate();
         }
     }
 
-//بحث عن جهة اتصال باستخدام id  وترجيع object
-    public Contact findById(long id) throws SQLException {
-        String sql = "SELECT id, name, phone, email, notes, created_at FROM contacts WHERE id=?";
-        try (Connection conn = Database.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setLong(1, id);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (!rs.next()) return null;
-                return map(rs);
-            }
-        }
-    }
-
-//عرض كل جهات الاتصال
-    public List<Contact> findAll() throws SQLException {
-//ترتيب حسب الجديد الاحدث بالاعلى
-        String sql = "SELECT id, name, phone, email, notes, created_at FROM contacts ORDER BY id DESC";
-        try (Connection conn = Database.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            List<Contact> out = new ArrayList<>();
-            while (rs.next()) out.add(map(rs));
-            return out;
-        }
-    }
-//البحث باستخدام الاسم او رقم الهاتف
-    public List<Contact> search(String q) throws SQLException {
+    // عرض جميع المكالمات لجهة اتصال معينة
+    public List<CallLog> findByContact(long contactId) throws SQLException {
+    	//ترتيب حسب الاحدث
         String sql = """
-            SELECT id, name, phone, email, notes, created_at
-            FROM contacts
-            WHERE name LIKE ? OR phone LIKE ?
+            SELECT id, contact_id, type, duration_seconds, call_at
+            FROM calls
+            WHERE contact_id=?
             ORDER BY id DESC
         """;
-        String like = "%" + (q == null ? "" : q.trim()) + "%";
         try (Connection conn = Database.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, like);
-            ps.setString(2, like);
+            ps.setLong(1, contactId);
             try (ResultSet rs = ps.executeQuery()) {
-                List<Contact> out = new ArrayList<>();
+                List<CallLog> out = new ArrayList<>();
                 while (rs.next()) out.add(map(rs));
                 return out;
             }
         }
     }
 
-//object لعرض جهة اتصال
-    private Contact map(ResultSet rs) throws SQLException {
-        return new Contact(
+    // الكائن object للمكالمة
+    private CallLog map(ResultSet rs) throws SQLException {
+        return new CallLog(
                 rs.getLong("id"),
-                rs.getString("name"),
-                rs.getString("phone"),
-                rs.getString("email"),
-                rs.getString("notes"),
-                rs.getString("created_at")
+                rs.getLong("contact_id"),
+                rs.getString("type"),
+                rs.getInt("duration_seconds"),
+                rs.getString("call_at")
         );
     }
 }
