@@ -33,6 +33,8 @@ public final class Database {
                   created_at TEXT NOT NULL DEFAULT (datetime('now'))
                 );
             """);
+       // تم تعريف حقل phone unique لمنع تكرار ارقام الهاتف
+            
 // انشاء جدول الرسايل
             st.execute("""
                 CREATE TABLE IF NOT EXISTS messages (
