@@ -5,6 +5,7 @@ import contactbook.model.Message;
 import javax.swing.*;
 import java.awt.*;
 
+//نافذة اضافة رسالة
 public class MessageFormDialog extends BaseFormDialog {
     private final JComboBox<String> directionCombo = new JComboBox<>(new String[]{"مرسلة", "مستلمة"});
     private final JTextArea bodyArea = new JTextArea(6, 30);
@@ -22,7 +23,7 @@ public class MessageFormDialog extends BaseFormDialog {
 
         gc.gridx = 0; gc.gridy = 0;
         form.add(new JLabel("النوع:"), gc);
-        gc.gridx = 1;
+        gc.gridx = 1;  // انشاء combo نوع الرسالة مستلمة او صادرة
         form.add(directionCombo, gc);
 
         gc.gridx = 0; gc.gridy++;
@@ -36,7 +37,7 @@ public class MessageFormDialog extends BaseFormDialog {
         JButton cancelBtn = new JButton("إلغاء");
         okBtn.addActionListener(e -> {
             if (bodyArea.getText().trim().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "الرجاء كتابة نص الرسالة.", "تنبيه", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "تأكد من كتابة نص الرسالة", "تنبيه", JOptionPane.WARNING_MESSAGE);
                 return;
             }
             closeWithSuccess();
@@ -50,10 +51,12 @@ public class MessageFormDialog extends BaseFormDialog {
         setLocationRelativeTo(owner);
     }
 
+    // انشاء object للرسالة
     public Message getResult(long contactId) {
         if (!isConfirmed()) return null;
         Message m = new Message();
         m.setContactId(contactId);
+        //تحديد نوع الرسالة حسب المختار من combo
         m.setDirection(directionCombo.getSelectedIndex() == 0 ? "SENT" : "RECEIVED");
         m.setBody(bodyArea.getText().trim());
         return m;
